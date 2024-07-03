@@ -51,20 +51,19 @@ void * Move_enemys();
 void Delete_enemy(enemy * delete);
 void free_enemys();
 
-
 //Global Variables
 ship * player ;
 bool finish = FALSE ;
-int input ;
+int input = 0 ;
 bullet * bullets_list = NULL ;
 bullet * last_bullet = NULL;
 int enemy_count = 0 ;
 enemy * enemy_list = NULL ;
 enemy * last_enemy = NULL ;
 int score = 0 ;
+int ship_rating_color = 8 ;
 int turn = 0 ;
 bool flag[2] ;
-
 
 //Mutex
 pthread_mutex_t playerMutex ;
@@ -94,6 +93,9 @@ int main(void)
     init_pair(2 , COLOR_GREEN , COLOR_BLACK);
     init_pair(3 , COLOR_WHITE , COLOR_BLACK);
     init_pair(4 , COLOR_RED , COLOR_BLACK);
+    init_pair(5 , COLOR_BLUE , COLOR_BLACK);
+    init_pair(6 , COLOR_MAGENTA , COLOR_BLACK);
+    init_pair(7 , COLOR_YELLOW , COLOR_BLACK);
 
     //init mutexs
     pthread_mutex_init(&playerMutex , NULL);
@@ -179,69 +181,80 @@ void Print_ship(int posX , int posY) {
     int y = posY;
 
     if(player->destroyed) attron(A_BLINK);
+    if(score < 5) {
+        ship_rating_color = 3 ;
+    }
+    else if(score >= 25 && score < 50) {
+        ship_rating_color = 2 ;
+    }
+    else if(score >= 50 && score < 75) {
+        ship_rating_color = 1 ;
+    }
+    else if(score >= 75 && score < 100) {
+        ship_rating_color = 5 ;
+    }
+    else if(score >= 100 && score < 150) {
+        ship_rating_color = 6 ;
+    }
+    else if(score >= 150 && score < 200) {
+        ship_rating_color = 7;
+    }
+    else {
+        ship_rating_color = 4 ;
+    }
     attron(COLOR_PAIR(1));
     mvaddch(y , x ,'-');
     attroff(COLOR_PAIR(1));
+    attron(COLOR_PAIR(3));
     mvaddch(y , x-1 ,'/');
     mvaddch(y , x+1 ,'\\');
-
     mvaddch(y+1 , x ,'-');
     mvaddch(y+1 , x-1 ,'/');
     mvaddch(y+1 , x-2 ,'/');
     mvaddch(y+1 , x+1 ,'\\');
     mvaddch(y+1 , x+2 ,'\\');
     mvaddch(y+2 , x ,' ');
-    attron(COLOR_PAIR(2));
-    mvaddch(y+2 , x-1 ,'[');
-    mvaddch(y+2 , x+1 ,']');
-    mvaddch(y+2 , x+8 ,'\\');
-    mvaddch(y+2 , x-8 ,'/');
-    attroff(COLOR_PAIR(2));
     mvaddch(y+2 , x-2 ,'_');
     mvaddch(y+2 , x-3 ,'/');
     mvaddch(y+2 , x-4 ,'_');
     mvaddch(y+2 , x-5 ,'-');
     mvaddch(y+2 , x-6 ,'_');
     mvaddch(y+2 , x-7 ,'|');
-
     mvaddch(y+2 , x+2 ,'_');
     mvaddch(y+2 , x+3 ,'\\');
     mvaddch(y+2 , x+4 ,'_');
     mvaddch(y+2 , x+5 ,'-');
     mvaddch(y+2 , x+6 ,'_');
     mvaddch(y+2 , x+7 ,'|');
-
-
     mvaddch(y+3 , x ,'-');
     mvaddch(y+3 , x-1 ,'-');
-    attron(COLOR_PAIR(2));
-    mvaddch(y+3 , x-2 ,'|');
-    mvaddch(y+3 , x-3 ,'|');
-    mvaddch(y+3 , x-8 ,'\\');
-    mvaddch(y+3 , x+8 ,'/');
-    attroff(COLOR_PAIR(2));
     mvaddch(y+3 , x-4 ,'-');
     mvaddch(y+3 , x-5 ,'_');
     mvaddch(y+3 , x-6 ,'-');
     mvaddch(y+3 , x-7 ,'|');
-
     mvaddch(y+3 , x+1 ,'-');
-    attron(COLOR_PAIR(2));
-    mvaddch(y+3 , x+2 ,'|');
-    mvaddch(y+3 , x+3 ,'|');
-    attroff(COLOR_PAIR(2));
     mvaddch(y+3 , x+4 ,'-');
     mvaddch(y+3 , x+5 ,'_');
     mvaddch(y+3 , x+6 ,'-');
     mvaddch(y+3 , x+7 ,'|');
-
-    attron(COLOR_PAIR(2));
-    mvaddch(y+4 , x ,'-');
-    attroff(COLOR_PAIR(2));
     mvaddch(y+4 , x-1 ,'\\');
     mvaddch(y+4 , x-2,'<');
     mvaddch(y+4 , x+1 ,'/');
     mvaddch(y+4 , x+2 ,'>');
+    attroff(COLOR_PAIR(3));
+    attron(COLOR_PAIR(ship_rating_color));
+    mvaddch(y+2 , x-1 ,'[');
+    mvaddch(y+2 , x+1 ,']');
+    mvaddch(y+2 , x+8 ,'\\');
+    mvaddch(y+2 , x-8 ,'/');
+    mvaddch(y+3 , x-2 ,'|');
+    mvaddch(y+3 , x-3 ,'|');
+    mvaddch(y+3 , x-8 ,'\\');
+    mvaddch(y+3 , x+8 ,'/');
+    mvaddch(y+3 , x+2 ,'|');
+    mvaddch(y+3 , x+3 ,'|');
+    mvaddch(y+4 , x ,'-');
+    attroff(COLOR_PAIR(ship_rating_color));
     if(player->destroyed) attroff(A_BLINK);
 }
 
@@ -385,21 +398,17 @@ void * Draw_game() {
             flag[1] = true ;
         }
         //Draw player
-        //pthread_mutex_lock(&lock);
         clear();
         Print_ship(player->startX , player->startY);
-        //pthread_mutex_unlock(&playerMutex);
 
         //Draw enemys
-        //pthread_mutex_lock(&enemysMutex);
         enemy * current_enemy = enemy_list ;
         while (current_enemy != NULL) {
             Print_enemy1(current_enemy);
             current_enemy = current_enemy->next ;
         }
-        //pthread_mutex_unlock(&enemysMutex);
+
         //Draw bullets
-        //pthread_mutex_lock(&bulletsMutex);
         bullet * current_bullet = bullets_list ;
         int color ;
         while (current_bullet != NULL) {
@@ -412,9 +421,10 @@ void * Draw_game() {
             attroff(COLOR_PAIR(color)) ;
             current_bullet = current_bullet->next ;
         }
-        mvprintw(2 , 2 , "[ Score : %d ]" , score);
+        attron(COLOR_PAIR(ship_rating_color));
+        mvprintw(2 , 2 , "SCORE %d" , score);
+        attroff(COLOR_PAIR(ship_rating_color));
         refresh();
-        //pthread_mutex_unlock(&bulletsMutex);
         turn = 0 ;
         flag[1] = false ;
     }
