@@ -65,6 +65,7 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
 void Presentation(int maxY , int maxX);
 void PauseLoop();
 void free_free_list();
+void Print_enemy2(enemy * e);
 
 //Global Variables
 enemy * enemys_memory[1000] ;
@@ -391,7 +392,7 @@ void * Player_input() {
 void * Move_bullets() {
     while (1) {
         if(_pause) continue;
-        pthread_mutex_lock(&bulletsMutex);
+        pthread_mutex_lock(&bulletsMutex) ;
         bullet * current_bullet = bullets_list ;
         enemy * current_enemy ;
         while (current_bullet != NULL) {
@@ -430,7 +431,22 @@ void * Move_bullets() {
                         if(current_bullet->positionY == current_enemy->positionY
                             && current_bullet->positionX >= current_enemy->positionX - 2
                             && current_bullet->positionX <= current_enemy->positionX + 2) {
-                            current_enemy->destroyed = TRUE ;
+                            current_enemy->lives -= 1 ;
+                            if(current_enemy->lives == 0) {
+                                current_enemy->destroyed = TRUE ;
+                            }
+                            score += 1 ;
+                            Delete_bullet(current_bullet);
+                        }
+                    }
+                    else if(current_enemy->rank == 2 && !current_enemy->destroyed) {
+                        if(current_bullet->positionY == current_enemy->positionY
+                            && current_bullet->positionX >= current_enemy->positionX - 4
+                            && current_bullet->positionX <= current_enemy->positionX + 4) {
+                            current_enemy->lives -= 1 ;
+                            if(current_enemy->lives == 0) {
+                                current_enemy->destroyed = TRUE ;
+                            }
                             score += 1 ;
                             Delete_bullet(current_bullet);
                         }
@@ -534,7 +550,12 @@ void * Draw_game() {
             //Draw enemys
             for(int i = 0 ; i < 1000 ; i++) {
                 if(enemys_memory[i] != NULL) {
-                    Print_enemy1(enemys_memory[i]);
+                    if(enemys_memory[i]->rank == 1) {
+                        Print_enemy1(enemys_memory[i]);
+                    }
+                    else if(enemys_memory[i]->rank == 2) {
+                        Print_enemy2(enemys_memory[i]);
+                    }
                 }
             }
 
@@ -574,31 +595,75 @@ void Print_enemy1(enemy * e) {
     mvaddch(y-1 , x-1 ,'-' );
     mvaddch(y-1 , x+1 , '-');
     if(e->shoot) {
-        mvaddch(y , x-1 , '\\');
-        mvaddch(y , x+1 , '/');
-    }
-    else {
         mvaddch(y , x-1 , '/');
         mvaddch(y , x+1 , '\\');
+    }
+    else {
+        mvaddch(y , x-1 , '\\');
+        mvaddch(y , x+1 , '/');
     }
     mvaddch(y , x-2 , '|');
     mvaddch(y , x+2 , '|');
     attroff(COLOR_PAIR(2));
     if(e->destroyed) attroff(A_BLINK);
+
+}
+
+void Print_enemy2(enemy * e) {
+    int x = e->positionX ;
+    int y = e->positionY ;
+    if(e->destroyed) attron((A_BLINK));
+    attron(COLOR_PAIR(4));
+    mvaddch(y , x , '^');
+    mvaddch(y - 1, x , 'v');
+    attroff(COLOR_PAIR(4));
+    attron(COLOR_PAIR(2));
+    if(e->shoot) {
+        mvaddch(y , x-1 , '/');
+        mvaddch(y , x+1 , '\\');
+    }
+    else {
+        mvaddch(y , x-1 , '\\');
+        mvaddch(y , x+1 , '/');
+    }
+    mvaddch(y - 1, x + 1, '\\');
+    mvaddch(y - 1, x - 1 , '/');
+    mvaddch(y , x + 2 , '|');
+    mvaddch(y , x - 2, '|');
+    mvaddch(y , x - 3, '-');
+    mvaddch(y , x + 3 , '-');
+    mvaddch(y , x  + 4, '/');
+    mvaddch(y , x - 4, '\\');
+    mvaddch(y - 1, x + 2 , '|');
+    mvaddch(y - 1, x - 2, '|');
+    mvaddch(y - 1, x + 3, '_');
+    mvaddch(y - 1, x - 3, '_');
+    mvaddch(y - 1, x + 4 , '\\');
+    mvaddch(y - 1, x - 4, '/');
+    attroff(COLOR_PAIR(2));
+    if(e->destroyed) attroff((A_BLINK));
+
 }
 
 void * Enemy_generator() {
     while (1) {
         if(_pause) continue;
         pthread_mutex_lock(&enemysMutex);
-        Create_enemys(5, 1);
+        if(score < 25) {
+            Create_enemys(5, 1);
+        }
+        else if(score >= 25) {
+            Create_enemys(2 , 2);
+            Create_enemys(3, 1);
+        }
         pthread_mutex_unlock(&enemysMutex);
         sleep(10);
+
     }
     return NULL ;
 }
 
-void  Create_enemys(int number_enemys , int rank) {
+void Create_enemys(int number_enemys , int rank) {
     int n = number_enemys ;
     enemy_count += number_enemys ;
     while (n != 0 ) {
@@ -608,7 +673,7 @@ void  Create_enemys(int number_enemys , int rank) {
             enemys_memory[index] = (enemy*)malloc(sizeof(enemy));
         }
         enemys_memory[index]->direction = rand() % 3 ;
-        enemys_memory[index]->lives = 1 ;
+        enemys_memory[index]->lives = rank ;
         enemys_memory[index]->height = 2 ;
         enemys_memory[index]->width = 5 ;
         enemys_memory[index]->rank = rank ;
@@ -712,12 +777,45 @@ void * Move_enemys() {
                     }
                     else if(rand() % 20 == 1) {
                         Add_bullet('|' , FALSE , enemys_memory[i]->positionX ,  enemys_memory[i]->positionY + 1 );
-                         enemys_memory[i]->shoot = TRUE ;
+                        enemys_memory[i]->shoot = TRUE ;
                     }
                     else {
                          enemys_memory[i]->shoot = FALSE;
                     }
-                }//End enemy1
+                }
+                else if (enemys_memory[i]->rank == 2) {
+                    if(enemys_memory[i]->direction == 0) {
+                        enemys_memory[i]->positionY+=1;
+                    }
+                    else if(enemys_memory[i]->direction == 1) {
+                        if(enemys_memory[i]->positionX-=1 < 5) {
+                            enemys_memory[i]->positionY+=1;
+                        }
+                        else enemys_memory[i]->positionX-=1;
+                    }
+                    else {
+                        if(enemys_memory[i]->positionX+=1 > COLS - 5) {
+                            enemys_memory[i]->positionY+=1;
+                        }
+                        else enemys_memory[i]->positionX+=1;
+                    }
+                    enemys_memory[i]->direction = rand() % 3;
+
+                    if(enemys_memory[i]->positionY > LINES || enemys_memory[i]->destroyed) {
+                        Add_block(MEMORY[i][0], i);
+                        MEMORY[i][1] = 1 ;//Space memory available
+                        enemys_memory[i] = NULL ;
+                        enemy_count -= 1;
+                    }
+                    else if(rand() % 20 == 1) {
+                        Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 1 ,  enemys_memory[i]->positionY + 1 );
+                        Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 1,  enemys_memory[i]->positionY + 1 );
+                        enemys_memory[i]->shoot = TRUE ;
+                    }
+                    else {
+                        enemys_memory[i]->shoot = FALSE;
+                    }
+                }
             }
         }
 
@@ -727,7 +825,7 @@ void * Move_enemys() {
     return NULL ;
 }
 
-void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color){
+void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color) {
     int length, x, y;
     float temp;
 
