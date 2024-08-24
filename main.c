@@ -492,7 +492,7 @@ void Add_bullet(chtype image , bool is_player , int x , int y) {
         bullets_list = (bullet*)malloc(sizeof(bullet));
         current = bullets_list ;
         last_bullet = bullets_list ;
-        current->bullte_image = image;
+        current->bullet_image = image;
         current->direction = bullet_direction;
         current->next = NULL ;
         current->positionX = x ;
@@ -502,7 +502,7 @@ void Add_bullet(chtype image , bool is_player , int x , int y) {
         current = last_bullet ;
         current->next = (bullet*)malloc(sizeof(bullet));
         current = current->next ;
-        current->bullte_image = image;
+        current->bullet_image = image;
         current->direction = bullet_direction ;
         current->next = NULL ;
         current->positionX = x ;
@@ -568,7 +568,7 @@ void * Draw_game() {
                 }
                 else color = 4 ;
                 attron(COLOR_PAIR(color)) ;
-                mvaddch(current_bullet->positionY , current_bullet->positionX , current_bullet->bullte_image) ;
+                mvaddch(current_bullet->positionY , current_bullet->positionX , current_bullet->bullet_image) ;
                 attroff(COLOR_PAIR(color)) ;
                 current_bullet = current_bullet->next ;
             }
