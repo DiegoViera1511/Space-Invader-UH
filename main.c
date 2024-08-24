@@ -19,7 +19,7 @@ typedef struct ship {
 typedef struct bullet {
     int positionX ;
     int positionY ;
-    chtype bullte_image ;
+    chtype bullet_image ;
     bool direction ; // 0 -> down , 1 -> up
     struct bullet * next ;
 } bullet;
@@ -846,4 +846,54 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
     mvwprintw(win, y, x, "%s", string);
     wattroff(win, color);
     refresh();
+}
+
+struct Node //Node structure for the queue
+{
+    int data;
+    struct Node* next;
+};
+struct Node *front,*rear;
+
+void enqueue(int x)
+{
+    struct Node *temp;
+
+    temp = (struct Node*)malloc(sizeof(struct Node));
+    temp->data = x;
+    temp->next = NULL;
+
+    if(front==NULL && rear == NULL)
+    {
+        front =rear =temp;
+        return;
+    }
+    rear->next = temp;
+    rear = temp;
+}
+
+void dequeue()
+{
+    struct Node *temp = front;
+
+    if(front==NULL)
+    {
+        printf("Error : QUEUE is empty!!");
+        return;
+    }
+    if(front==rear)
+        front = rear = NULL;
+
+    else
+        front = front->next;
+
+    free(temp);
+}
+
+int see_front() // to have the value from the front of the queue but not delete it
+{
+    int a;
+    a = front->data;
+
+    return(a);
 }
