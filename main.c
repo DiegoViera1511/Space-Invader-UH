@@ -61,6 +61,8 @@ void * Move_enemys();
 void Add_block(int space , int index);
 void Delete_block(int index);
 int FirstFit(int space);
+int BestFit(int space);
+int WorstFit(int space);
 void GameLoop(int maxY , int maxX);
 void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color);
 void Presentation(int maxY , int maxX);
@@ -724,14 +726,61 @@ void Create_enemys(int number_enemys , int rank) {
 }
 
 int FirstFit(int space) {
+
     block * current = free_list;
+
     if(current == NULL) {
         return 0 ;
     }
+
     while (current->space < space) {
         current = current->next ;
     }
+
     return current->index ;
+}
+
+int BestFit(int space){
+
+    block * current = free_list;
+
+    if(current == NULL) {
+        return 0 ;
+    }
+
+    block * best=free_list;
+    int aux=30000;
+
+    while (current!=NULL){
+        int tmp = current->space - space;
+        if(tmp>=0 && tmp < aux){
+           aux=tmp;
+           best=current;
+        }
+        current = current->next ;
+    }
+    return best->index;
+}
+int WorstFit(int space){
+
+    block * current = free_list;
+
+    if(current == NULL) {
+        return 0 ;
+    }
+
+    block * best=free_list;
+    int aux=30000;
+
+    while (current!=NULL){
+        int tmp = current->space - space;
+        if(tmp>=0 && tmp > aux){
+            aux=tmp;
+            best=current;
+        }
+        current = current->next ;
+    }
+    return best->index;
 }
 
 void Add_block(int space , int index) {// add block to the free list if you delete an enemy
