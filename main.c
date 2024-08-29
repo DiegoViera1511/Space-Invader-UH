@@ -6,6 +6,7 @@
 #include <locale.h>
 #include <menu.h>
 #include <string.h>
+#include <time.h>
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
 typedef struct ship {
@@ -66,6 +67,11 @@ void Presentation(int maxY , int maxX);
 void PauseLoop();
 void free_free_list();
 void Print_enemy2(enemy * e);
+void enqueue(int x);
+void dequeue();
+int see_front();
+void gen_en();
+
 
 //Global Variables
 enemy * enemys_memory[1000] ;
@@ -85,6 +91,13 @@ bool _pause = FALSE ;
 int op = 0 ;
 WINDOW * pause_menu_window ;
 
+//-----------------------------------
+//testing                           //
+int gen_enem1=0 ;
+int gen_enem2=0 ;                   //
+int gen_enem3=0 ;                   //
+//-----------------------------------
+
 //Dekker algorithm vars
 int turn = 0 ;
 bool flag[2] ;
@@ -94,7 +107,6 @@ pthread_mutex_t playerMutex ;
 pthread_mutex_t bulletsMutex ;
 pthread_mutex_t enemysMutex ;
 pthread_mutex_t pauseMutex ;
-
 
 int main(void)
 {
@@ -645,16 +657,40 @@ void Print_enemy2(enemy * e) {
 
 }
 
+/*
+ *The function  "void * Enemy_generator()" implement a simulation of fifo algorithm from scheduling
+ * We generate 3 random variables and introduce then in a queue in order of generation and in the same order
+ * we generate the loot of corresponding enemies applying "First In - First Out" in enemy generation
+ */
 void * Enemy_generator() {
     while (1) {
         if(_pause) continue;
         pthread_mutex_lock(&enemysMutex);
-        if(score < 25) {
-            Create_enemys(5, 1);
+
+        gen_en();
+        enqueue(gen_enem1);
+        enqueue(gen_enem2);
+        enqueue(gen_enem3);
+
+        if(score < 50 && see_front()==1){
+            Create_enemys(4, 1);
+            Create_enemys(1,2);
+            dequeue();
         }
-        else if(score >= 25) {
-            Create_enemys(2 , 2);
+        if(score < 50 &&see_front() ==2){
+            Create_enemys(4, 2);
+            Create_enemys(1,1);
+            dequeue();
+        }
+        if(score >= 50 && see_front()==1){
+            Create_enemys(4, 1);
+            Create_enemys(3, 2);
+            dequeue();
+        }
+        if(score >= 50 && see_front()==2){
+            Create_enemys(5, 2);
             Create_enemys(3, 1);
+            dequeue();
         }
         pthread_mutex_unlock(&enemysMutex);
         sleep(10);
@@ -848,7 +884,8 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
     refresh();
 }
 
-struct Node //Node structure for the queue
+//Node structure of our Queue
+struct Node
 {
     int data;
     struct Node* next;
@@ -890,10 +927,18 @@ void dequeue()
     free(temp);
 }
 
-int see_front() // to have the value from the front of the queue but not delete it
+// to have the value from the front of the queue but not delete it
+int see_front()
 {
     int a;
     a = front->data;
 
     return(a);
+}
+// Generates random values of 1 or 2 for those 3 variables
+void gen_en(){
+    srand(time(NULL));
+    gen_enem1 = (rand() % 2) + 1;
+    gen_enem2 = (rand() % 2) + 1;
+    gen_enem3 = (rand() % 2) + 1;
 }
