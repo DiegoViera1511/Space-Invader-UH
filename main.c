@@ -92,13 +92,9 @@ int ship_rating_color = 3 ;
 bool _pause = FALSE ;
 int op = 0 ;
 WINDOW * pause_menu_window ;
-
-//-----------------------------------
-//testing                           //
 int gen_enem1=0 ;
-int gen_enem2=0 ;                   //
-int gen_enem3=0 ;                   //
-//-----------------------------------
+int gen_enem2=0 ;
+int gen_enem3=0 ;
 
 //Dekker algorithm vars
 int turn = 0 ;
