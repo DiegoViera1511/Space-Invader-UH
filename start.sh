@@ -3,20 +3,20 @@
 while [ 1 == 1 ]; do
   clear
   echo " "
-  echo "                                                   SPACE INVADER                  "
+  echo "                                                                    SPACE INVADER                  "
   echo " "
   echo " "
   echo " "
-  echo "                                             |￣￣￣￣￣￣￣￣￣￣￣￣￣￣|             "
-  echo "                                                     Welcome to                     "
-  echo "                                                    the adventure                    "
-  echo "                                              |＿＿＿＿＿＿＿＿＿＿＿＿＿＿|              "
-  echo "                                                     \ (•◡•) /                        "
-  echo "                                                      \     /                         "
+  echo "                                                            |￣￣￣￣￣￣￣￣￣￣￣￣￣￣|             "
+  echo "                                                                   Welcome to                     "
+  echo "                                                                  the adventure                    "
+  echo "                                                             |＿＿＿＿＿＿＿＿＿＿＿＿＿＿|              "
+  echo "                                                                    \ (•◡•) /                        "
+  echo "                                                                     \     /                         "
   echo " "
   echo " "
   echo " "
-  echo "                                                 By Diego & Pablo"
+  echo "                                                                  By Diego & Pablo"
   echo " "
   echo " "
   echo "S -> Start the adventure"
@@ -24,9 +24,9 @@ while [ 1 == 1 ]; do
   echo " "
   echo -n "> "
   read input
-  if [ $input == "e" ] ; then
+  if [ $input == "e" || $input == "E" ] ; then
     break
-  elif [ $input == "s" ]; then
+  elif [ $input == "s" || $input == "S" ]; then
     ./rungame
   fi
 done
