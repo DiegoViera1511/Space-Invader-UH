@@ -3,6 +3,14 @@
 while [ 1 == 1 ]; do
   clear
   echo " "
+  echo " "
+  echo " "
+  echo " "
+  echo " "
+  echo " "
+  echo " "
+  echo " "
+  echo " "
   echo "                                                                    SPACE INVADER                  "
   echo " "
   echo " "
@@ -10,7 +18,7 @@ while [ 1 == 1 ]; do
   echo "                                                            |￣￣￣￣￣￣￣￣￣￣￣￣￣￣|             "
   echo "                                                                   Welcome to                     "
   echo "                                                                  the adventure                    "
-  echo "                                                             |＿＿＿＿＿＿＿＿＿＿＿＿＿＿|              "
+  echo "                                                            |＿＿＿＿＿＿＿＿＿＿＿＿＿＿|              "
   echo "                                                                    \ (•◡•) /                        "
   echo "                                                                     \     /                         "
   echo " "
