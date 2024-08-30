@@ -1,4 +1,7 @@
-﻿#include <stdio.h>
+﻿//Copyright © -> Diego Viera & Pablo Gómez
+// Havana University
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <ncurses.h>
@@ -948,7 +951,7 @@ void * Move_enemys() {
         if(_pause) continue;
         pthread_mutex_lock(&enemysMutex);
         for(int i = 0 ; i < 1000 ; i++) {
-            if(enemys_memory[i] != NULL) { //if there is a Enemy then move it
+            if(enemys_memory[i] != NULL) { //if there is an Enemy then move it
                     if(enemys_memory[i]->direction == 0) {
                         enemys_memory[i]->positionY+=1;
                     }
@@ -1023,15 +1026,13 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
 }
 
 //Node structure of our Queue
-struct Node
-{
+struct Node {
     int data;
     struct Node* next;
 };
 struct Node *front,*rear;
 
-void enqueue(int x)
-{
+void enqueue(int x) {
     struct Node *temp;
 
     temp = (struct Node*)malloc(sizeof(struct Node));
@@ -1047,8 +1048,7 @@ void enqueue(int x)
     rear = temp;
 }
 
-void dequeue()
-{
+void dequeue() {
     struct Node *temp = front;
 
     if(front==NULL)
@@ -1066,13 +1066,12 @@ void dequeue()
 }
 
 // to have the value from the front of the queue but not delete it
-int see_front()
-{
+int see_front(){
     int a;
     a = front->data;
-
     return(a);
 }
+
 // Generates random values of 1 or 2 for those 3 variables
 void gen_en(){
     srand(time(NULL));
@@ -1089,7 +1088,6 @@ void safe_txt(const char *filename, int valor) {
         perror("Error on save");
         return;
     }
-
     fprintf(archivo, "%d\n", valor);
     fclose(archivo);
 }
@@ -1109,7 +1107,6 @@ int read_txt(const char *filemame) {
         fclose(archivo);
         return -1;
     }
-
     fclose(archivo);
     return valor;
 }
