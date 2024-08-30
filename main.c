@@ -4,7 +4,6 @@
 #include <ncurses.h>
 #include <unistd.h>
 #include <locale.h>
-#include <menu.h>
 #include <string.h>
 #include <time.h>
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -69,6 +68,7 @@ void Presentation(int maxY , int maxX);
 void PauseLoop();
 void free_free_list();
 void Print_enemy2(enemy * e);
+void Print_enemy3(enemy * e);
 void enqueue(int x);
 void dequeue();
 int see_front();
@@ -176,18 +176,35 @@ int main(void)
     free(player);
     free_free_list();
 
+    int best_score = read_txt(filename);
+    if(score > best_score) {
+        safe_txt(filename , score);
+        clear();
+        attron(COLOR_PAIR(2));
+        attron(A_BLINK);
+        mvprintw( maxY / 2 , maxX/ 2 - 5  , "NEW RECORD %d !" , score);
+        attroff(A_BLINK);
+        attroff(COLOR_PAIR(3));
+        refresh();
+        sleep(3);
+    }
+    clear();
+    mvprintw( maxY / 2 , maxX/ 2 - 5  , "SCORE %d" , score);
+    refresh();
+    sleep(2);
     clear();
     mvprintw( maxY / 2 , maxX/ 2 - 5  , "GAME OVER");
     refresh();
-
     sleep(2);
     endwin();
     return 0;
 }
 
 void Presentation(int maxY , int maxX) {
+    int best_score = read_txt(filename);
     attron(COLOR_PAIR(2));
     mvprintw( maxY / 2 - 2, maxX / 2 - 7  , "SPACE INVADER");
+    mvprintw( maxY / 2 + 2, maxX / 2 - 7  , "Best score %d" , best_score);
     attroff(COLOR_PAIR(2));
     attron(A_BLINK);
     mvprintw( maxY / 2 , maxX / 2 - 12  , "- press enter to start -");
@@ -464,6 +481,18 @@ void * Move_bullets() {
                             Delete_bullet(current_bullet);
                         }
                     }
+                    else if (current_enemy->rank == 3 && !current_enemy->destroyed) {
+                        if(current_bullet->positionY == current_enemy->positionY
+                            && current_bullet->positionX >= current_enemy->positionX - 11
+                            && current_bullet->positionX <= current_enemy->positionX + 11) {
+                            current_enemy->lives -= 1 ;
+                            if(current_enemy->lives == 0) {
+                                current_enemy->destroyed = TRUE ;
+                            }
+                            score += 1 ;
+                            Delete_bullet(current_bullet);
+                        }
+                    }
                 }
                 pthread_mutex_unlock(&enemysMutex);
             }
@@ -569,6 +598,9 @@ void * Draw_game() {
                     else if(enemys_memory[i]->rank == 2) {
                         Print_enemy2(enemys_memory[i]);
                     }
+                    else if(enemys_memory[i]->rank == 3) {
+                        Print_enemy3(enemys_memory[i]);
+                    }
                 }
             }
 
@@ -599,7 +631,7 @@ void * Draw_game() {
 void Print_enemy1(enemy * e) {
     int x = e->positionX ;
     int y = e->positionY ;
-    if(e->destroyed) attron(A_BLINK);
+
     attron(COLOR_PAIR(4));
     mvaddch(y , x , '^');
     attroff(COLOR_PAIR(4));
@@ -618,14 +650,12 @@ void Print_enemy1(enemy * e) {
     mvaddch(y , x-2 , '|');
     mvaddch(y , x+2 , '|');
     attroff(COLOR_PAIR(2));
-    if(e->destroyed) attroff(A_BLINK);
 
 }
 
 void Print_enemy2(enemy * e) {
     int x = e->positionX ;
     int y = e->positionY ;
-    if(e->destroyed) attron((A_BLINK));
     attron(COLOR_PAIR(4));
     mvaddch(y , x , '^');
     mvaddch(y - 1, x , 'v');
@@ -654,8 +684,82 @@ void Print_enemy2(enemy * e) {
     mvaddch(y - 1, x + 4 , '\\');
     mvaddch(y - 1, x - 4, '/');
     attroff(COLOR_PAIR(2));
-    if(e->destroyed) attroff((A_BLINK));
 
+}
+
+void Print_enemy3(enemy * e) {
+    int x = e->positionX;
+    int y = e->positionY;
+    attron(COLOR_PAIR(4));
+    mvaddch(y , x , 'O');
+    mvaddch(y - 1, x , '.');
+    mvaddch(y - 1 , x + 1 , '.');
+    mvaddch(y - 1, x + 2, '.');
+    mvaddch(y - 1, x - 1 , '.');
+    mvaddch(y - 1, x - 2, '.');
+    mvaddch(y - 3, x , 'X');
+    attroff(COLOR_PAIR(4));
+    attron(COLOR_PAIR(2));
+    mvaddch(y , x - 1, '_');
+    mvaddch(y , x + 1, '_');
+    mvaddch(y , x + 2, '_');
+    mvaddch(y , x - 2 , '_');
+    mvaddch(y , x + 3 , '/');
+    mvaddch(y , x - 3, '\\');
+    mvaddch(y , x - 4, '-');
+    mvaddch(y , x - 5, '-');
+    mvaddch(y , x - 6, '-');
+    mvaddch(y , x + 4, '-');
+    mvaddch(y , x + 5, '-');
+    mvaddch(y , x + 6, '-');
+
+    mvaddch(y - 1, x + 3 , '\\');
+    mvaddch(y - 1, x + 4, '_');
+    mvaddch(y - 1, x + 5, '_');
+    mvaddch(y - 1, x  + 6, '_');
+    mvaddch(y - 1, x + 7, '/');
+    mvaddch(y - 1, x + 8 , '_');
+    mvaddch(y - 1, x + 9 , '_');
+    mvaddch(y - 1, x  + 10, '=');
+    mvaddch(y - 1, x + 11, ')');
+    mvaddch(y - 1, x - 3 , '/');
+    mvaddch(y - 1, x - 4, '_');
+    mvaddch(y - 1, x - 5, '_');
+    mvaddch(y - 1, x - 6, '_');
+    mvaddch(y - 1, x - 7, '\\');
+    mvaddch(y - 1, x - 8 , '_');
+    mvaddch(y - 1, x - 9 , '_');
+    mvaddch(y - 1, x  - 10, '=');
+    mvaddch(y - 1, x - 11, '(');
+
+    mvaddch(y - 2, x , '=');
+    mvaddch(y - 2, x - 1, '=');
+    mvaddch(y - 2, x - 2, '=');
+    mvaddch(y - 2, x  - 3, '=');
+    mvaddch(y - 2, x - 4 , '-');
+    mvaddch(y - 2, x - 5, '-');
+    mvaddch(y - 2, x - 6, '-');
+    mvaddch(y - 2, x - 7, '_');
+    mvaddch(y - 2, x - 8, '_');
+    mvaddch(y - 2, x - 9, '_');
+
+    mvaddch(y - 2, x + 1, '=');
+    mvaddch(y - 2, x + 2, '=');
+    mvaddch(y - 2, x  + 3, '=');
+    mvaddch(y - 2, x + 4 , '-');
+    mvaddch(y - 2, x + 5, '-');
+    mvaddch(y - 2, x + 6, '-');
+    mvaddch(y - 2, x + 7, '_');
+    mvaddch(y - 2, x + 8, '_');
+    mvaddch(y - 2, x + 9, '_');
+
+    mvaddch(y - 3, x - 1 , '-');
+    mvaddch(y - 3, x + 1, '-');
+    mvaddch(y - 3, x + 2 , '\\');
+    mvaddch(y - 3, x + 3, '\\');
+    mvaddch(y - 3, x - 2, '/');
+    mvaddch(y - 3, x - 3, '/');
+    attroff(COLOR_PAIR(2));
 }
 
 /*
@@ -676,6 +780,7 @@ void * Enemy_generator() {
         if(score < 50 && see_front()==1){
             Create_enemys(4, 1);
             Create_enemys(1,2);
+            Create_enemys(2 , 3);
             dequeue();
         }
         if(score < 50 &&see_front() ==2){
@@ -760,6 +865,7 @@ int BestFit(int space){
     }
     return best->index;
 }
+
 int WorstFit(int space){
 
     block * current = free_list;
@@ -835,7 +941,6 @@ void * Move_enemys() {
         pthread_mutex_lock(&enemysMutex);
         for(int i = 0 ; i < 1000 ; i++) {
             if(enemys_memory[i] != NULL) { //if there is a Enemy then move it
-                if(enemys_memory[i]->rank == 1) {
                     if(enemys_memory[i]->direction == 0) {
                         enemys_memory[i]->positionY+=1;
                     }
@@ -846,7 +951,7 @@ void * Move_enemys() {
                         else enemys_memory[i]->positionX-=1;
                     }
                     else {
-                        if(enemys_memory[i]->positionX+=1 > COLS - 5) {
+                        if(enemys_memory[i]->positionX + 1 > COLS - 5) {
                             enemys_memory[i]->positionY+=1;
                         }
                         else enemys_memory[i]->positionX+=1;
@@ -860,46 +965,23 @@ void * Move_enemys() {
                         enemy_count -= 1;
                     }
                     else if(rand() % 20 == 1) {
-                        Add_bullet('|' , FALSE , enemys_memory[i]->positionX ,  enemys_memory[i]->positionY + 1 );
+                        if(enemys_memory[i]->rank == 1) {
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX ,  enemys_memory[i]->positionY + 1 );
+                        }
+                        else if (enemys_memory[i]->rank == 2) {
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 1,  enemys_memory[i]->positionY + 1 );
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 1,  enemys_memory[i]->positionY + 1 );
+                        }
+                        else if(enemys_memory[i]->rank == 3) {
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX ,  enemys_memory[i]->positionY + 1 );
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 5,  enemys_memory[i]->positionY + 1 );
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 5,  enemys_memory[i]->positionY + 1 );
+                        }
                         enemys_memory[i]->shoot = TRUE ;
                     }
                     else {
                          enemys_memory[i]->shoot = FALSE;
                     }
-                }
-                else if (enemys_memory[i]->rank == 2) {
-                    if(enemys_memory[i]->direction == 0) {
-                        enemys_memory[i]->positionY+=1;
-                    }
-                    else if(enemys_memory[i]->direction == 1) {
-                        if(enemys_memory[i]->positionX-=1 < 5) {
-                            enemys_memory[i]->positionY+=1;
-                        }
-                        else enemys_memory[i]->positionX-=1;
-                    }
-                    else {
-                        if(enemys_memory[i]->positionX+=1 > COLS - 5) {
-                            enemys_memory[i]->positionY+=1;
-                        }
-                        else enemys_memory[i]->positionX+=1;
-                    }
-                    enemys_memory[i]->direction = rand() % 3;
-
-                    if(enemys_memory[i]->positionY > LINES || enemys_memory[i]->destroyed) {
-                        Add_block(MEMORY[i][0], i);
-                        MEMORY[i][1] = 1 ;//Space memory available
-                        enemys_memory[i] = NULL ;
-                        enemy_count -= 1;
-                    }
-                    else if(rand() % 20 == 1) {
-                        Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 1 ,  enemys_memory[i]->positionY + 1 );
-                        Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 1,  enemys_memory[i]->positionY + 1 );
-                        enemys_memory[i]->shoot = TRUE ;
-                    }
-                    else {
-                        enemys_memory[i]->shoot = FALSE;
-                    }
-                }
             }
         }
 
@@ -1023,43 +1105,3 @@ int read_txt(const char *filemame) {
     fclose(archivo);
     return valor;
 }
-
-
-
-/*                                  ATENTION
- *
- * Diego usa estas funciones son para poner junto al game over el record actual y el mejor record
- * no tienes que crear el txt el lo crea solo y cuando vayas a updatear el best record es escribir y ya
- * el solo reescribe no tienes que borrar pa volver a escribir...a continuacion esta el ejemplo
- * de como funciona, lo probe en un script aparte y pincha bien, es solo integrarlo a la ventana de game over
- * que ya creaste...Buenos diass!!! :)
- *
- * pdt: const char *nombreArchivo = "valor.txt"; ya lo puse en las variables globales asi q no tienes
- * que crear el nombre del archivo
- *
- *
- * Ejemplo:
-
-             int main() {
-
-                const char *nombreArchivo = "valor.txt";     //esto ya esta en las variables globales
-                                                            //aparece como "filename"
-
-           ----------Guardar el valor en el archivo------------
-                safe_txt(nombreArchivo, 9);
-
-            ----------Leer el valor desde el archivo-----------
-                int valorLeido = read_txt(nombreArchivo);
-
-
-                if (valorLeido != -1) {
-
-                    if(valorLeido==9){
-
-                        printf("good");
-                    }
-                    else printf("not good");
-                }
-                return 0;
-            }
- */
