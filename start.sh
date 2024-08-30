@@ -19,14 +19,14 @@ while [ 1 == 1 ]; do
   echo "                                                                  By Diego & Pablo"
   echo " "
   echo " "
-  echo "S -> Start the adventure"
-  echo "E -> Exit (just for loosers)"
+  echo "[s] -> Start the adventure"
+  echo "[e] -> Exit (just for loosers)"
   echo " "
   echo -n "> "
   read input
-  if [ $input == "e" || $input == "E" ] ; then
+  if [ $input == "e" ] ; then
     break
-  elif [ $input == "s" || $input == "S" ]; then
+  elif [ $input == "s"]; then
     ./rungame
   fi
 done
