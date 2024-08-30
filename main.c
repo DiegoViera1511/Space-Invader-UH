@@ -778,24 +778,32 @@ void * Enemy_generator() {
         enqueue(gen_enem3);
 
         if(score < 50 && see_front()==1){
-            Create_enemys(4, 1);
+            Create_enemys(3, 1);
             Create_enemys(1,2);
-            Create_enemys(2 , 3);
             dequeue();
         }
         if(score < 50 &&see_front() ==2){
-            Create_enemys(4, 2);
+            Create_enemys(3, 2);
             Create_enemys(1,1);
             dequeue();
         }
+        if(score < 50 &&see_front() ==3){
+            Create_enemys(3, 2);
+            Create_enemys(2,1);
+            dequeue();
+        }
         if(score >= 50 && see_front()==1){
-            Create_enemys(4, 1);
+            Create_enemys(3, 1);
             Create_enemys(3, 2);
             dequeue();
         }
         if(score >= 50 && see_front()==2){
-            Create_enemys(5, 2);
-            Create_enemys(3, 1);
+            Create_enemys(2, 2);
+            Create_enemys(4, 1);
+            dequeue();
+        }
+        if(score >= 50 && see_front()==2){
+            Create_enemys(3, 3);
             dequeue();
         }
         pthread_mutex_unlock(&enemysMutex);
@@ -1068,11 +1076,11 @@ int see_front()
 // Generates random values of 1 or 2 for those 3 variables
 void gen_en(){
     srand(time(NULL));
-    gen_enem1 = (rand() % 2) + 1;
-    gen_enem2 = (rand() % 2) + 1;
-    gen_enem3 = (rand() % 2) + 1;
+    gen_enem1 = (rand() % 3) + 1;
+    gen_enem2 = (rand() % 3) + 1;
+    gen_enem3 = (rand() % 3) + 1;
 }
-//---------------------------------------------------------------------------------------------------------
+
 void safe_txt(const char *filename, int valor) {
     FILE *archivo;
 
