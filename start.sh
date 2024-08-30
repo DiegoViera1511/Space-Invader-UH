@@ -3,10 +3,24 @@
 while [ 1 == 1 ]; do
   clear
   echo " "
-  echo "                                                                           SPACE INVADER"
+  echo "                                                   SPACE INVADER                  "
   echo " "
-  echo "s -> start game"
-  echo "e -> exit game"
+  echo " "
+  echo " "
+  echo "                                             |￣￣￣￣￣￣￣￣￣￣￣￣￣￣|             "
+  echo "                                                     Welcome to                     "
+  echo"                                                    the adventure                    "
+  echo"                                              |＿＿＿＿＿＿＿＿＿＿＿＿＿＿|              "
+  echo"                                                     \ (•◡•) /                        "
+  echo"                                                      \     /                         "
+  echo" "
+  echo" "
+  echo" "
+  echo"                                                 By Diego & Pablo"
+  echo" "
+  echo" "
+  echo "S -> Start the adventure"
+  echo "E -> Exit (just for loosers)"
   echo " "
   echo -n "> "
   read input
@@ -16,7 +30,3 @@ while [ 1 == 1 ]; do
     ./rungame
   fi
 done
-
-
-
-
