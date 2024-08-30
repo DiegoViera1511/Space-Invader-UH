@@ -786,13 +786,13 @@ void * Enemy_generator() {
             dequeue();
         }
         if(score < 50 &&see_front() ==2){
-            Create_enemys(3, 2);
-            Create_enemys(1,1);
+            Create_enemys(2, 2);
+            Create_enemys(2,1);
             dequeue();
         }
         if(score < 50 &&see_front() ==3){
-            Create_enemys(3, 2);
-            Create_enemys(2,1);
+            Create_enemys(2, 2);
+            Create_enemys(3,1);
             dequeue();
         }
         if(score >= 50 && see_front()==1){
