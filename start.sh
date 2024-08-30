@@ -26,7 +26,7 @@ while [ 1 == 1 ]; do
   read input
   if [ $input == "e" ] ; then
     break
-  elif [ $input == "s"]; then
+  elif [ $input == "s" ]; then
     ./rungame
   fi
 done
