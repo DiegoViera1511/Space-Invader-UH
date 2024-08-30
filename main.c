@@ -73,7 +73,8 @@ void enqueue(int x);
 void dequeue();
 int see_front();
 void gen_en();
-
+int read_txt(const char *filename);
+void safe_txt(const char *filename, int valor);
 
 //Global Variables
 enemy * enemys_memory[1000] ;
@@ -95,6 +96,8 @@ WINDOW * pause_menu_window ;
 int gen_enem1=0 ;
 int gen_enem2=0 ;
 int gen_enem3=0 ;
+const char *filename = "valor.txt";
+
 
 //Dekker algorithm vars
 int turn = 0 ;
@@ -987,3 +990,76 @@ void gen_en(){
     gen_enem2 = (rand() % 2) + 1;
     gen_enem3 = (rand() % 2) + 1;
 }
+//---------------------------------------------------------------------------------------------------------
+void safe_txt(const char *filename, int valor) {
+    FILE *archivo;
+
+    archivo = fopen(filename, "w");
+    if (archivo == NULL) {
+        perror("Error on save");
+        return;
+    }
+
+    fprintf(archivo, "%d\n", valor);
+    fclose(archivo);
+}
+
+int read_txt(const char *filemame) {
+    FILE *archivo;
+    int valor;
+
+    archivo = fopen(filename, "r");
+
+    if (archivo == NULL) {
+        perror("Error on read");
+        return -1;
+    }
+    if (fscanf(archivo, "%d", &valor) != 1) {
+        printf("Error on read");
+        fclose(archivo);
+        return -1;
+    }
+
+    fclose(archivo);
+    return valor;
+}
+
+
+
+/*                                  ATENTION
+ *
+ * Diego usa estas funciones son para poner junto al game over el record actual y el mejor record
+ * no tienes que crear el txt el lo crea solo y cuando vayas a updatear el best record es escribir y ya
+ * el solo reescribe no tienes que borrar pa volver a escribir...a continuacion esta el ejemplo
+ * de como funciona, lo probe en un script aparte y pincha bien, es solo integrarlo a la ventana de game over
+ * que ya creaste...Buenos diass!!! :)
+ *
+ * pdt: const char *nombreArchivo = "valor.txt"; ya lo puse en las variables globales asi q no tienes
+ * que crear el nombre del archivo
+ *
+ *
+ * Ejemplo:
+
+             int main() {
+
+                const char *nombreArchivo = "valor.txt";     //esto ya esta en las variables globales
+                                                            //aparece como "filename"
+
+           ----------Guardar el valor en el archivo------------
+                safe_txt(nombreArchivo, 9);
+
+            ----------Leer el valor desde el archivo-----------
+                int valorLeido = read_txt(nombreArchivo);
+
+
+                if (valorLeido != -1) {
+
+                    if(valorLeido==9){
+
+                        printf("good");
+                    }
+                    else printf("not good");
+                }
+                return 0;
+            }
+ */
