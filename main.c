@@ -78,6 +78,7 @@ int see_front();
 void gen_en();
 int read_txt(const char *filename);
 void safe_txt(const char *filename, int valor);
+void Print_enemyBOSS(enemy * e);
 
 //Global Variables
 enemy * enemys_memory[1000] ;
@@ -99,6 +100,7 @@ WINDOW * pause_menu_window ;
 int gen_enem1=0 ;
 int gen_enem2=0 ;
 int gen_enem3=0 ;
+int gen_enem4=0 ;
 const char *filename = "valor.txt";
 
 
@@ -496,6 +498,18 @@ void * Move_bullets() {
                             Delete_bullet(current_bullet);
                         }
                     }
+                    else if (current_enemy->rank == 4 && !current_enemy->destroyed) {
+                        if(current_bullet->positionY == current_enemy->positionY
+                            && current_bullet->positionX >= current_enemy->positionX - 20
+                            && current_bullet->positionX <= current_enemy->positionX + 20) {
+                            current_enemy->lives -= 1 ;
+                            if(current_enemy->lives == 0) {
+                                current_enemy->destroyed = TRUE ;
+                            }
+                            score += 1 ;
+                            Delete_bullet(current_bullet);
+                            }
+                    }
                 }
                 pthread_mutex_unlock(&enemysMutex);
             }
@@ -603,6 +617,9 @@ void * Draw_game() {
                     }
                     else if(enemys_memory[i]->rank == 3) {
                         Print_enemy3(enemys_memory[i]);
+                    }
+                    else if(enemys_memory[i]->rank == 4) {
+                        Print_enemyBOSS(enemys_memory[i]);
                     }
                 }
             }
@@ -765,12 +782,165 @@ void Print_enemy3(enemy * e) {
     attroff(COLOR_PAIR(2));
 }
 
+void Print_enemyBOSS(enemy * e) {
+
+    int x = e->positionX ;
+    int y = e->positionY ;
+
+    attron(COLOR_PAIR(4));
+    mvaddch(y - 1, x - 14, 'O');
+    mvaddch(y - 1, x - 16, 'O');
+    mvaddch(y - 1, x - 18, 'O');
+    mvaddch(y - 1, x + 14, 'O');
+    mvaddch(y - 1, x + 16, 'O');
+    mvaddch(y - 1, x + 18, 'O');
+    mvaddch(y - 4, x + 1 , '=');
+    mvaddch(y - 4, x + 2 , '=');
+    mvaddch(y - 4, x + 3, '=');
+    mvaddch(y - 4, x - 1 , '=');
+    mvaddch(y - 4, x - 2 , '=');
+    mvaddch(y - 4, x - 3, '=');
+    mvaddch(y - 4, x , '=');
+    mvaddch(y - 1 , x , '_');
+    mvaddch(y - 1, x + 1, ')');
+    mvaddch(y - 1, x - 1, '(');
+    mvaddch(y - 2, x + 8 , '(');
+    mvaddch(y - 2, x + 9, '_');
+    mvaddch(y - 2, x + 10, ')');
+    mvaddch(y - 2, x - 8 , ')');
+    mvaddch(y - 2, x - 9, '_');
+    mvaddch(y - 2, x - 10, '(');
+    mvaddch(y - 3, x + 4, '(');
+    mvaddch(y - 3, x + 5, '_');
+    mvaddch(y - 3, x + 6, ')');
+    mvaddch(y - 3, x - 4, ')');
+    mvaddch(y - 3, x - 5, '_');
+    mvaddch(y - 3, x - 6, '(');
+    mvaddch(y - 5, x - 1, '(');
+    mvaddch(y - 5, x, '_');
+    mvaddch(y - 5, x + 1, ')');
+    attroff(COLOR_PAIR(4));
+
+    mvaddch(y , x , '_');
+    mvaddch(y , x - 1, '_');
+    mvaddch(y , x - 2, '_');
+    mvaddch(y , x - 3, '_');
+    mvaddch(y , x + 1, '_');
+    mvaddch(y , x + 2, '_');
+    mvaddch(y , x + 3, '_');
+    mvaddch(y , x + 4, '/');
+    mvaddch(y , x - 4, '\\');
+    mvaddch(y , x + 5, '_');
+    mvaddch(y , x + 6, '_');
+    mvaddch(y , x - 7, '\\');
+    mvaddch(y , x - 5, '_');
+    mvaddch(y , x - 6, '_');
+    mvaddch(y , x + 7, '/');
+
+    mvaddch(y - 1, x - 5, '|');
+    mvaddch(y - 1, x + 5, '|');
+    mvaddch(y - 1, x - 7, '/');
+    mvaddch(y - 1, x + 7, '\\');
+    mvaddch(y - 1, x + 8, '_');
+    mvaddch(y - 1, x + 9, '_');
+    mvaddch(y - 1 , x + 10, '_');
+    mvaddch(y - 1, x + 11, '/');
+    mvaddch(y - 1, x - 8, '_');
+    mvaddch(y - 1, x - 9, '_');
+    mvaddch(y - 1 , x - 10, '_');
+    mvaddch(y - 1, x - 11, '\\');
+
+    mvaddch(y - 2, x , '_');
+    mvaddch(y - 2, x + 4, '\\');
+    mvaddch(y - 2, x + 6, '|');
+    mvaddch(y - 2, x + 12, '_');
+    mvaddch(y - 2, x + 13 , '_');
+    mvaddch(y - 2, x + 14 , '_');
+    mvaddch(y - 2, x + 15 , '_');
+    mvaddch(y - 2, x + 16 , '+');
+    mvaddch(y - 2, x + 17 , '_');
+    mvaddch(y - 2, x + 18 , '_');
+    mvaddch(y - 2, x + 19 , '_');
+    mvaddch(y - 2, x + 20 , '>');
+    mvaddch(y - 2, x - 4, '/');
+    mvaddch(y - 2, x - 6, '|');
+    mvaddch(y - 2, x - 12, '_');
+    mvaddch(y - 2, x - 13 , '_');
+    mvaddch(y - 2, x - 14 , '_');
+    mvaddch(y - 2, x - 15 , '_');
+    mvaddch(y - 2, x - 16 , '+');
+    mvaddch(y - 2, x - 17 , '_');
+    mvaddch(y - 2, x - 18 , '_');
+    mvaddch(y - 2, x - 19 , '_');
+    mvaddch(y - 2, x - 20 , '<');
+
+    mvaddch(y - 3, x , '_');
+    mvaddch(y - 3, x + 1 , '_');
+    mvaddch(y - 3, x + 2, '_');
+    mvaddch(y - 3, x + 3, '_');
+    mvaddch(y - 3, x + 7 , '/');
+    mvaddch(y - 3, x + 9 ,'_');
+    mvaddch(y - 3, x + 11, '\\');
+    mvaddch(y - 3, x + 12 , '_');
+    mvaddch(y - 3, x + 13 , '_');
+    mvaddch(y - 3, x + 14, '_');
+    mvaddch(y - 3, x + 15, '_');
+    mvaddch(y - 3, x + 16, '_');
+    mvaddch(y - 3, x + 17, '_');
+    mvaddch(y - 3, x + 18, '_');
+    mvaddch(y - 3, x + 19, '_');
+    mvaddch(y - 3, x - 1 , '_');
+    mvaddch(y - 3, x - 2, '_');
+    mvaddch(y - 3, x - 3, '_');
+    mvaddch(y - 3, x - 7 , '\\');
+    mvaddch(y - 3, x - 9 ,'_');
+    mvaddch(y - 3, x - 11, '/');
+    mvaddch(y - 3, x - 12 , '_');
+    mvaddch(y - 3, x - 13 , '_');
+    mvaddch(y - 3, x - 14, '_');
+    mvaddch(y - 3, x - 15, '_');
+    mvaddch(y - 3, x - 16, '_');
+    mvaddch(y - 3, x - 17, '_');
+    mvaddch(y - 3, x - 18, '_');
+    mvaddch(y - 3, x - 19, '_');
+
+    mvaddch(y - 4, x + 5, '_');
+    mvaddch(y - 4, x + 6 , '\\');
+    mvaddch(y - 4, x + 7, '_');
+    mvaddch(y - 4, x + 8, '_');
+    mvaddch(y - 4, x + 9, '_');
+    mvaddch(y - 4, x + 10, '_');
+    mvaddch(y - 4, x - 5, '_');
+    mvaddch(y - 4, x - 6 , '/');
+    mvaddch(y - 4, x - 7, '_');
+    mvaddch(y - 4, x - 8, '_');
+    mvaddch(y - 4, x - 9, '_');
+    mvaddch(y - 4, x - 10, '_');
+
+    mvaddch(y - 5, x + 3 ,'\\');
+    mvaddch(y - 5, x + 4, '_');
+    mvaddch(y - 5, x + 5, '_');
+    mvaddch(y - 5, x - 3 ,'/');
+    mvaddch(y - 5, x - 4, '_');
+    mvaddch(y - 5, x - 5, '_');
+
+    mvaddch(y - 6, x , '_');
+    mvaddch(y - 6, x + 2, '\\');
+    mvaddch(y - 6, x - 2, '/');
+
+    mvaddch(y - 7, x , '|');
+    mvaddch(y - 7, x + 1 , '_');
+    mvaddch(y - 7, x - 1 , '_');
+
+}
+
 /*
  *The function  "void * Enemy_generator()" implement a simulation of fifo algorithm from scheduling
  * We generate 3 random variables and introduce then in a queue in order of generation and in the same order
  * we generate the loot of corresponding enemies applying "First In - First Out" in enemy generation
  */
 void * Enemy_generator() {
+
     while (1) {
         if(_pause) continue;
         pthread_mutex_lock(&enemysMutex);
@@ -779,6 +949,7 @@ void * Enemy_generator() {
         enqueue(gen_enem1);
         enqueue(gen_enem2);
         enqueue(gen_enem3);
+        enqueue(gen_enem4);
 
         if(score < 50 && see_front()==1){
             Create_enemys(3, 1);
@@ -795,6 +966,10 @@ void * Enemy_generator() {
             Create_enemys(3,1);
             dequeue();
         }
+        if(score < 50 &&see_front() ==4){
+            Create_enemys(1, 3);
+            dequeue();
+        }
         if(score >= 50 && see_front()==1){
             Create_enemys(3, 1);
             Create_enemys(3, 2);
@@ -809,6 +984,10 @@ void * Enemy_generator() {
             Create_enemys(3, 3);
             dequeue();
         }
+        if(score >= 50 && see_front()==4){
+            Create_enemys(1, 4);
+            dequeue();
+        }
         pthread_mutex_unlock(&enemysMutex);
         sleep(10);
 
@@ -820,18 +999,20 @@ void Create_enemys(int number_enemys , int rank) {
     int n = number_enemys ;
     enemy_count += number_enemys ;
     while (n != 0 ) {
+
         int index = FirstFit(rank);
+
         MEMORY[index][1] = 0 ;
         if(enemys_memory[index] == NULL) {
             enemys_memory[index] = (enemy*)malloc(sizeof(enemy));
         }
-        enemys_memory[index]->direction = rand() % 3 ;
-        enemys_memory[index]->lives = rank ;
+        enemys_memory[index]->direction = rank == 4 ? rand() % 2 + 1 : rand() % 3;
+        enemys_memory[index]->lives = rank == 4 ? 15 : rank ;
         enemys_memory[index]->height = 2 ;
         enemys_memory[index]->width = 5 ;
         enemys_memory[index]->rank = rank ;
-        enemys_memory[index]->positionY = 3 ;
-        enemys_memory[index]->positionX = 10 + rand() % 140;
+        enemys_memory[index]->positionY = rank == 4 ? 10 : 3;
+        enemys_memory[index]->positionX = rank == 4 ? COLS / 2 : 10 + rand() % 140;
         enemys_memory[index]->shoot = FALSE ;
         enemys_memory[index]->memory_index = index ;
         enemys_memory[index]->destroyed = FALSE ;
@@ -952,22 +1133,36 @@ void * Move_enemys() {
         pthread_mutex_lock(&enemysMutex);
         for(int i = 0 ; i < 1000 ; i++) {
             if(enemys_memory[i] != NULL) { //if there is an Enemy then move it
-                    if(enemys_memory[i]->direction == 0) {
-                        enemys_memory[i]->positionY+=1;
-                    }
-                    else if(enemys_memory[i]->direction == 1) {
-                        if(enemys_memory[i]->positionX-=1 < 5) {
-                            enemys_memory[i]->positionY+=1;
+                    if(enemys_memory[i]->rank == 4) {
+                        if(enemys_memory[i]->positionX + 20 > COLS - 3 && enemys_memory[i]->direction ==  2) {
+                            enemys_memory[i]->direction = 1 ;
                         }
-                        else enemys_memory[i]->positionX-=1;
+                        if(enemys_memory[i]->positionX - 20 < COLS + 3 && enemys_memory[i]->direction ==  1) {
+                            enemys_memory[i]->direction = 2 ;
+                        }
+                        if(enemys_memory[i]->direction == 1 ) {
+                            enemys_memory[i]->positionX -= 1;
+                        }
+                        else enemys_memory[i]->positionX += 1 ;
                     }
                     else {
-                        if(enemys_memory[i]->positionX + 1 > COLS - 5) {
+                        if(enemys_memory[i]->direction == 0) {
                             enemys_memory[i]->positionY+=1;
                         }
-                        else enemys_memory[i]->positionX+=1;
+                        else if(enemys_memory[i]->direction == 1) {
+                            if(enemys_memory[i]->positionX - 1 < 5) {
+                                enemys_memory[i]->positionY += 1;
+                            }
+                            else enemys_memory[i]->positionX-=1;
+                        }
+                        else {
+                            if(enemys_memory[i]->positionX + 1 > COLS - 5) {
+                                enemys_memory[i]->positionY-=1;
+                            }
+                            else enemys_memory[i]->positionX+=1;
+                        }
+                        enemys_memory[i]->direction = rand() % 3;
                     }
-                    enemys_memory[i]->direction = rand() % 3;
 
                     if(enemys_memory[i]->positionY > LINES || enemys_memory[i]->destroyed) {
                         Add_block(MEMORY[i][0], i);
@@ -987,6 +1182,17 @@ void * Move_enemys() {
                             Add_bullet('|' , FALSE , enemys_memory[i]->positionX ,  enemys_memory[i]->positionY + 1 );
                             Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 5,  enemys_memory[i]->positionY + 1 );
                             Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 5,  enemys_memory[i]->positionY + 1 );
+                        }
+                        else if(enemys_memory[i]->rank == 4) {
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX , enemys_memory[i]->positionY + 1) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 5, enemys_memory[i]->positionY + 1) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 5 , enemys_memory[i]->positionY + 1) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 14, enemys_memory[i]->positionY ) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 16, enemys_memory[i]->positionY ) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX - 18,enemys_memory[i]->positionY ) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 14, enemys_memory[i]->positionY ) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 16, enemys_memory[i]->positionY ) ;
+                            Add_bullet('|' , FALSE , enemys_memory[i]->positionX + 18,enemys_memory[i]->positionY ) ;
                         }
                         enemys_memory[i]->shoot = TRUE ;
                     }
@@ -1075,9 +1281,10 @@ int see_front(){
 // Generates random values of 1 or 2 for those 3 variables
 void gen_en(){
     srand(time(NULL));
-    gen_enem1 = (rand() % 3) + 1;
-    gen_enem2 = (rand() % 3) + 1;
-    gen_enem3 = (rand() % 3) + 1;
+    gen_enem1 = (rand() % 4) + 1;
+    gen_enem2 = (rand() % 4) + 1;
+    gen_enem3 = (rand() % 4) + 1;
+    gen_enem4= (rand() % 4) + 1;
 }
 
 void safe_txt(const char *filename, int valor) {
