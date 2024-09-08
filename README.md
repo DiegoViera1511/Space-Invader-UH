@@ -33,7 +33,7 @@ Este proyecto no solo fue un desafío técnico en el desarrollo del juego, sino 
 
 ## Gameplay
 
-[Imgur](https://imgur.com/e5kzZHO)
+![Imgur](https://imgur.com/e5kzZHO)
 
 
 #### By Diego Viera and [Pablo Gómez](https://github.com/theleywin)
