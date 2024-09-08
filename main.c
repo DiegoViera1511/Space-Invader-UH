@@ -1067,7 +1067,7 @@ int WorstFit(int space){
     }
 
     block * best=free_list;
-    int aux=30000;
+    int aux=0;
 
     while (current!=NULL){
         int tmp = current->space - space;
