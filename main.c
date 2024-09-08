@@ -1137,7 +1137,7 @@ void * Move_enemys() {
                         if(enemys_memory[i]->positionX + 20 > COLS - 3 && enemys_memory[i]->direction ==  2) {
                             enemys_memory[i]->direction = 1 ;
                         }
-                        if(enemys_memory[i]->positionX - 20 < COLS + 3 && enemys_memory[i]->direction ==  1) {
+                        if(enemys_memory[i]->positionX - 20 < 3 && enemys_memory[i]->direction == 1) {
                             enemys_memory[i]->direction = 2 ;
                         }
                         if(enemys_memory[i]->direction == 1 ) {
